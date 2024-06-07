@@ -11,43 +11,105 @@
 # from rest_framework.generics import GenericAPIView
 # from rest_framework.mixins import ListModelMixin,CreateModelMixin,RetrieveModelMixin,UpdateModelMixin,DestroyModelMixin
 
-from rest_framework.generics import ListAPIView,CreateAPIView,RetrieveAPIView,UpdateAPIView,DestroyAPIView,ListCreateAPIView,RetrieveUpdateAPIView,RetrieveDestroyAPIView
-from.models import Student
+# from rest_framework.generics import ListAPIView,CreateAPIView,RetrieveAPIView,UpdateAPIView,DestroyAPIView,ListCreateAPIView,RetrieveUpdateAPIView,RetrieveDestroyAPIView
+# from.models import Student
+# from.serilazers import StudentSerilazer
+
+
+# class Studentlist(ListAPIView):
+#     queryset=Student.objects.all()
+#     serializer_class=StudentSerilazer
+
+
+# class StudentCreate(CreateAPIView):
+#     queryset=Student.objects.all()
+#     serializer_class=StudentSerilazer
+
+# class StudentRetriavte(RetrieveAPIView):
+#     queryset=Student.objects.all()
+#     serializer_class=StudentSerilazer
+
+# class StudentUpdate(UpdateAPIView):
+#     queryset=Student.objects.all()
+#     serializer_class=StudentSerilazer
+
+# class StudentDestroy(DestroyAPIView):
+#     queryset=Student.objects.all()
+#     serializer_class=StudentSerilazer
+
+# class StudentCrate(ListCreateAPIView):
+#     queryset=Student.objects.all()
+#     serializer_class=StudentSerilazer
+
+# class StudentRu(RetrieveUpdateAPIView):
+#     queryset=Student.objects.all()
+#     serializer_class=StudentSerilazer
+
+# class Studentde(RetrieveDestroyAPIView):
+#     queryset=Student.objects.all()
+#     serializer_class=StudentSerilazer
+
+
+
+from rest_framework.response import Response
+from .models import Student
 from.serilazers import StudentSerilazer
+from rest_framework import status
+from rest_framework import viewsets
 
 
-class Studentlist(ListAPIView):
-    queryset=Student.objects.all()
-    serializer_class=StudentSerilazer
+
+class Studentviewset(viewsets.ViewSet):
+    def list(self,request):
+        stu=Student.objects.all()
+        serilazers=StudentSerilazer(stu,many=True)
+        return Response(serilazers.data)
+    
+    def retrive(self,request,pk=None):
+        id=pk
+        if id is not None:
+            stu=Student.objects.get(id=id)
+            serilazers=StudentSerilazer(stu)
+            return Response(serilazers.data)
+        
+
+    def create(self,request):
+        serilazers=StudentSerilazer(data=request.data)
+        if serilazers.is_valid():
+            serilazers.save()
+            return Response({'msg':'Create data'},status=status.HTTP_201_CREATED)
+        return Response(serilazers.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+
+    def update(self,request,pk):
+        id=pk
+        stu=Student.objects.get(pk=id)
+        serilazer=StudentSerilazer(stu,data=request.data)
+        if serilazer.is_valid():
+            serilazer.save()
+
+            return Response({'msg':'Data update'})
+        return Response(serilazer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+
+    def partial(self, request,pk):
+        id =pk 
+        stu=Student.objects.get(pk=id)
+        serilazers=StudentSerilazer(stu,data=request.data)
+        if serilazers.is_valid():
+            serilazers.save()
+            return Response({'msg':'Data Partial update'})
+        return Response(serilazers.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+
+    def destry(self, request,pk):
+        id =pk
+        stu=Student.objects.get(pk=id)
+        stu.delete()
+        return Response({'msg':'data deleted'})
+    
 
 
-class StudentCreate(CreateAPIView):
-    queryset=Student.objects.all()
-    serializer_class=StudentSerilazer
-
-class StudentRetriavte(RetrieveAPIView):
-    queryset=Student.objects.all()
-    serializer_class=StudentSerilazer
-
-class StudentUpdate(UpdateAPIView):
-    queryset=Student.objects.all()
-    serializer_class=StudentSerilazer
-
-class StudentDestroy(DestroyAPIView):
-    queryset=Student.objects.all()
-    serializer_class=StudentSerilazer
-
-class StudentCrate(ListCreateAPIView):
-    queryset=Student.objects.all()
-    serializer_class=StudentSerilazer
-
-class StudentRu(RetrieveUpdateAPIView):
-    queryset=Student.objects.all()
-    serializer_class=StudentSerilazer
-
-class Studentde(RetrieveDestroyAPIView):
-    queryset=Student.objects.all()
-    serializer_class=StudentSerilazer
 
 
 
